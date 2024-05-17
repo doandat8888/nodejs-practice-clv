@@ -83,6 +83,15 @@ route.delete('/delete/:username', (req, res) => {
 
 route.get('/search', (req, res) => {
     const searchParams = req.query;
+    for (const key in searchParams) {
+        // Check if user has key
+        if (!users[0][key]) {
+            return res.status(404).json({
+                msg: "This property isn't exist"
+            });
+        }
+    }
+
     const searchResult = searchUsers(searchParams);
     if(searchResult.length === 0) {
         return res.status(404).json({
@@ -93,28 +102,6 @@ route.get('/search', (req, res) => {
         data: searchResult
     })
 });
-
-function searchUsers(searchParams) {
-    return users.filter(user => {
-        for (const key in searchParams) {
-            if (searchParams[key]) {
-                if (key === "projects") {
-                    const projects = searchParams[key];
-                    for (const project of projects.split(',')) {
-                        if (!user[key].includes(project)) {
-                            return false;
-                        }
-                    }
-                } else {
-                    if (user[key].toLowerCase().indexOf(searchParams[key].toLowerCase()) === -1) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    });
-}
 
 function searchUsers(searchParams) {
     return users.filter(user => {
